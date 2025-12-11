@@ -19,101 +19,49 @@
 <canvas id="gameCanvas"></canvas>
 
 <script>
-// 主畫布
+// --- 取得 Canvas ---
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-// 兔子
-let rabbit = {
-    x: canvas.width / 2 - scale(50),
-    y: canvas.height - scale(100) - 20,
-    width: scale(100),
-    height: scale(100)
-};
 
-// 蘿蔔
-let carrot = {
-    x: Math.random() * (canvas.width - scale(40)),
-    y: -scale(40),
-    width: scale(40),
-    height: scale(40),
-    speed: scale(3)
-};
-// 設定成全螢幕
+// --- 動態符合螢幕大小 ---
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // 重設兔子位置（保持在底部）
-    rabbit.y = canvas.height - rabbit.height - 20;
+    // 更新縮放後的物件大小
+    rabbit.width = scale(100);
+    rabbit.height = scale(100);
+    rabbit.y = canvas.height - rabbit.height - scale(20);
+
+    carrot.width = scale(40);
+    carrot.height = scale(40);
+    carrot.speed = scale(3);
 }
 window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
 
-// 載入圖片
+// --- 依螢幕高度做縮放（跟背景 cover 一致） ---
+function scale(value) {
+    const baseHeight = 600; // 原始高度
+    return value * (canvas.height / baseHeight);
+}
+
+// --- 載入圖片 ---
 const rabbitImg = new Image();
 rabbitImg.src = "rabbit.png";
 
 const carrotImg = new Image();
 carrotImg.src = "carrot.png";
 
-// 物件比例（依螢幕大小自動縮放）
-function scale(value) {
-    return value * (canvas.width / 500); // 以原本 500 寬為基準
-}
+// --- 遊戲物件 ---
+let rabbit = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+};
 
-
-
-// 分數
-let score = 0;
-
-// 滑鼠控制兔子
-canvas.addEventListener("mousemove", (e) => {
-    rabbit.x = e.clientX - rabbit.width / 2;
-});
-
-// 更新遊戲
-function update() {
-    carrot.y += carrot.speed;
-
-    // 掉到底 → 重生
-    if (carrot.y > canvas.height) {
-        carrot.x = Math.random() * (canvas.width - carrot.width);
-        carrot.y = -carrot.height;
-    }
-
-    // 碰撞判斷
-    if (rabbit.x < carrot.x + carrot.width &&
-        rabbit.x + rabbit.width > carrot.x &&
-        rabbit.y < carrot.y + carrot.height &&
-        rabbit.y + rabbit.height > carrot.y) {
-
-        score++;
-        carrot.x = Math.random() * (canvas.width - carrot.width);
-        carrot.y = -carrot.height;
-    }
-}
-
-// 畫圖
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.drawImage(rabbitImg, rabbit.x, rabbit.y, rabbit.width, rabbit.height);
-    ctx.drawImage(carrotImg, carrot.x, carrot.y, carrot.width, carrot.height);
-
-    ctx.fillStyle = "white";
-    ctx.font = scale(20) + "px Arial";
-    ctx.fillText("Score: " + score, 20, 30);
-}
-
-// 遊戲循環
-function gameLoop() {
-    update();
-    draw();
-    requestAnimationFrame(gameLoop);
-}
-
-gameLoop();
-</script>
-
-</body>
-</html>
+let carrot = {
+    x: 0,
+    y: 0,
+    width: 0,
+    heigh
