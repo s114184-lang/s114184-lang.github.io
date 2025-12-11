@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>兔子接胡蘿蔔</title>
+    <title>兔子接胡蘿蔔 - 全螢幕版</title>
     <style>
         body {
             margin: 0;
@@ -16,12 +16,23 @@
 </head>
 <body>
 
-<canvas id="gameCanvas" width="500" height="600"></canvas>
+<canvas id="gameCanvas"></canvas>
 
 <script>
-// 取得畫布
+// 主畫布
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
+// 設定成全螢幕
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // 重設兔子位置（保持在底部）
+    rabbit.y = canvas.height - rabbit.height - 20;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
 // 載入圖片
 const rabbitImg = new Image();
@@ -30,56 +41,59 @@ rabbitImg.src = "rabbit.png";
 const carrotImg = new Image();
 carrotImg.src = "carrot.png";
 
-// 兔子籃子
+// 物件比例（依螢幕大小自動縮放）
+function scale(value) {
+    return value * (canvas.width / 500); // 以原本 500 寬為基準
+}
+
+// 兔子
 let rabbit = {
-    x: canvas.width / 2 - 50,
-    y: canvas.height - 120,
-    width: 100,
-    height: 100
+    x: canvas.width / 2 - scale(50),
+    y: canvas.height - scale(100) - 20,
+    width: scale(100),
+    height: scale(100)
 };
 
-// 胡蘿蔔
+// 蘿蔔
 let carrot = {
-    x: Math.random() * (canvas.width - 40),
-    y: -40,
-    width: 40,
-    height: 40,
-    speed: 3
+    x: Math.random() * (canvas.width - scale(40)),
+    y: -scale(40),
+    width: scale(40),
+    height: scale(40),
+    speed: scale(3)
 };
 
 // 分數
 let score = 0;
 
-// 滑鼠移動 → 控制兔子
+// 滑鼠控制兔子
 canvas.addEventListener("mousemove", (e) => {
-    let rect = canvas.getBoundingClientRect();
-    let mouseX = e.clientX - rect.left;
-    rabbit.x = mouseX - rabbit.width / 2;
+    rabbit.x = e.clientX - rabbit.width / 2;
 });
 
 // 更新遊戲
 function update() {
     carrot.y += carrot.speed;
 
-    // 掉到底重生
+    // 掉到底 → 重生
     if (carrot.y > canvas.height) {
         carrot.x = Math.random() * (canvas.width - carrot.width);
-        carrot.y = -40;
+        carrot.y = -carrot.height;
     }
 
-    // 碰撞（簡單方框判定）
+    // 碰撞判斷
     if (rabbit.x < carrot.x + carrot.width &&
         rabbit.x + rabbit.width > carrot.x &&
         rabbit.y < carrot.y + carrot.height &&
         rabbit.y + rabbit.height > carrot.y) {
-        
+
         score++;
         carrot.x = Math.random() * (canvas.width - carrot.width);
-        carrot.y = -40;
+        carrot.y = -carrot.height;
     }
 }
 
-// 畫面渲染
+// 畫圖
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -87,11 +101,11 @@ function draw() {
     ctx.drawImage(carrotImg, carrot.x, carrot.y, carrot.width, carrot.height);
 
     ctx.fillStyle = "white";
-    ctx.font = "24px Arial";
+    ctx.font = scale(20) + "px Arial";
     ctx.fillText("Score: " + score, 20, 30);
 }
 
-// 遊戲主迴圈
+// 遊戲循環
 function gameLoop() {
     update();
     draw();
