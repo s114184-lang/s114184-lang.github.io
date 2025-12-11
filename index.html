@@ -22,7 +22,22 @@
 // 主畫布
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+// 兔子
+let rabbit = {
+    x: canvas.width / 2 - scale(50),
+    y: canvas.height - scale(100) - 20,
+    width: scale(100),
+    height: scale(100)
+};
 
+// 蘿蔔
+let carrot = {
+    x: Math.random() * (canvas.width - scale(40)),
+    y: -scale(40),
+    width: scale(40),
+    height: scale(40),
+    speed: scale(3)
+};
 // 設定成全螢幕
 function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -46,22 +61,7 @@ function scale(value) {
     return value * (canvas.width / 500); // 以原本 500 寬為基準
 }
 
-// 兔子
-let rabbit = {
-    x: canvas.width / 2 - scale(50),
-    y: canvas.height - scale(100) - 20,
-    width: scale(100),
-    height: scale(100)
-};
 
-// 蘿蔔
-let carrot = {
-    x: Math.random() * (canvas.width - scale(40)),
-    y: -scale(40),
-    width: scale(40),
-    height: scale(40),
-    speed: scale(3)
-};
 
 // 分數
 let score = 0;
