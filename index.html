@@ -1,10 +1,105 @@
-<!DOCPYTE html>
-<html>
-  <head>
-    <title>Hi</title>
-    <link rel="icon" href="icon.png">
-  </head>
-  <body>
-    hi
-  </body>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>兔子接胡蘿蔔</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            background: url("background.jpg") no-repeat center/cover;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="500" height="600"></canvas>
+
+<script>
+// 取得畫布
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// 載入圖片
+const rabbitImg = new Image();
+rabbitImg.src = "rabbit.png";
+
+const carrotImg = new Image();
+carrotImg.src = "carrot.png";
+
+// 兔子籃子
+let rabbit = {
+    x: canvas.width / 2 - 50,
+    y: canvas.height - 120,
+    width: 100,
+    height: 100
+};
+
+// 胡蘿蔔
+let carrot = {
+    x: Math.random() * (canvas.width - 40),
+    y: -40,
+    width: 40,
+    height: 40,
+    speed: 3
+};
+
+// 分數
+let score = 0;
+
+// 滑鼠移動 → 控制兔子
+canvas.addEventListener("mousemove", (e) => {
+    let rect = canvas.getBoundingClientRect();
+    let mouseX = e.clientX - rect.left;
+    rabbit.x = mouseX - rabbit.width / 2;
+});
+
+// 更新遊戲
+function update() {
+    carrot.y += carrot.speed;
+
+    // 掉到底重生
+    if (carrot.y > canvas.height) {
+        carrot.x = Math.random() * (canvas.width - carrot.width);
+        carrot.y = -40;
+    }
+
+    // 碰撞（簡單方框判定）
+    if (rabbit.x < carrot.x + carrot.width &&
+        rabbit.x + rabbit.width > carrot.x &&
+        rabbit.y < carrot.y + carrot.height &&
+        rabbit.y + rabbit.height > carrot.y) {
+        
+        score++;
+        carrot.x = Math.random() * (canvas.width - carrot.width);
+        carrot.y = -40;
+    }
+}
+
+// 畫面渲染
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.drawImage(rabbitImg, rabbit.x, rabbit.y, rabbit.width, rabbit.height);
+    ctx.drawImage(carrotImg, carrot.x, carrot.y, carrot.width, carrot.height);
+
+    ctx.fillStyle = "white";
+    ctx.font = "24px Arial";
+    ctx.fillText("Score: " + score, 20, 30);
+}
+
+// 遊戲主迴圈
+function gameLoop() {
+    update();
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+
+</body>
 </html>
