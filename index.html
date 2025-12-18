@@ -19,49 +19,115 @@
 <canvas id="gameCanvas"></canvas>
 
 <script>
-// --- 取得 Canvas ---
+// ================= Canvas =================
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// --- 動態符合螢幕大小 ---
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    // 更新縮放後的物件大小
-    rabbit.width = scale(100);
-    rabbit.height = scale(100);
-    rabbit.y = canvas.height - rabbit.height - scale(20);
-
-    carrot.width = scale(40);
-    carrot.height = scale(40);
-    carrot.speed = scale(3);
-}
-window.addEventListener("resize", resizeCanvas);
-
-// --- 依螢幕高度做縮放（跟背景 cover 一致） ---
-function scale(value) {
-    const baseHeight = 600; // 原始高度
-    return value * (canvas.height / baseHeight);
-}
-
-// --- 載入圖片 ---
+// ================= 載入圖片 =================
 const rabbitImg = new Image();
 rabbitImg.src = "rabbit.png";
 
 const carrotImg = new Image();
 carrotImg.src = "carrot.png";
 
-// --- 遊戲物件 ---
-let rabbit = {
+// ================= 遊戲物件（一定要先宣告） =================
+const rabbit = {
     x: 0,
     y: 0,
     width: 0,
-    height: 0
+    height: 0,
+    speed: 0
 };
 
-let carrot = {
+const carrot = {
     x: 0,
     y: 0,
     width: 0,
-    heigh
+    height: 0,
+    speed: 0
+};
+
+// ================= 縮放（跟背景一致） =================
+function scale(value) {
+    const baseHeight = 600;
+    return value * (canvas.height / baseHeight);
+}
+
+// ================= 全螢幕 =================
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    rabbit.width = scale(120);
+    rabbit.height = scale(120);
+    rabbit.speed = scale(8);
+    rabbit.y = canvas.height - rabbit.height - scale(20);
+
+    carrot.width = scale(50);
+    carrot.height = scale(50);
+    carrot.speed = scale(5);
+
+    resetCarrot();
+}
+
+window.addEventListener("resize", resizeCanvas);
+
+// ================= 初始化 =================
+function resetCarrot() {
+    carrot.x = Math.random() * (canvas.width - carrot.width);
+    carrot.y = -carrot.height;
+}
+
+// ================= 操作 =================
+const keys = {};
+window.addEventListener("keydown", e => keys[e.key] = true);
+window.addEventListener("keyup", e => keys[e.key] = false);
+
+// ================= 更新 =================
+function update() {
+    if (keys["ArrowLeft"]) rabbit.x -= rabbit.speed;
+    if (keys["ArrowRight"]) rabbit.x += rabbit.speed;
+
+    rabbit.x = Math.max(0, Math.min(canvas.width - rabbit.width, rabbit.x));
+
+    carrot.y += carrot.speed;
+
+    // 碰撞偵測
+    if (
+        rabbit.x < carrot.x + carrot.width &&
+        rabbit.x + rabbit.width > carrot.x &&
+        rabbit.y < carrot.y + carrot.height &&
+        rabbit.y + rabbit.height > carrot.y
+    ) {
+        resetCarrot();
+    }
+
+    if (carrot.y > canvas.height) {
+        resetCarrot();
+    }
+}
+
+// ================= 繪製 =================
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(rabbitImg, rabbit.x, rabbit.y, rabbit.width, rabbit.height);
+    ctx.drawImage(carrotImg, carrot.x, carrot.y, carrot.width, carrot.height);
+}
+
+// ================= 主迴圈 =================
+function gameLoop() {
+    update();
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+
+// ================= 啟動 =================
+rabbitImg.onload = () => {
+    resizeCanvas();
+    rabbit.x = (canvas.width - rabbit.width) / 2;
+    gameLoop();
+};
+</script>
+
+</body>
+</html>
