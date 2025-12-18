@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>兔子接胡蘿蔔 - 全螢幕版</title>
+    <title>兔子接胡蘿蔔 - 滑鼠控制</title>
     <style>
         body {
             margin: 0;
@@ -11,6 +11,7 @@
         canvas {
             display: block;
             background: url("background.jpg") no-repeat center/cover;
+            cursor: none; /* 隱藏滑鼠游標（可刪） */
         }
     </style>
 </head>
@@ -30,13 +31,12 @@ rabbitImg.src = "rabbit.png";
 const carrotImg = new Image();
 carrotImg.src = "carrot.png";
 
-// ================= 遊戲物件（一定要先宣告） =================
+// ================= 遊戲物件 =================
 const rabbit = {
     x: 0,
     y: 0,
     width: 0,
-    height: 0,
-    speed: 0
+    height: 0
 };
 
 const carrot = {
@@ -47,7 +47,7 @@ const carrot = {
     speed: 0
 };
 
-// ================= 縮放（跟背景一致） =================
+// ================= 縮放 =================
 function scale(value) {
     const baseHeight = 600;
     return value * (canvas.height / baseHeight);
@@ -60,7 +60,6 @@ function resizeCanvas() {
 
     rabbit.width = scale(120);
     rabbit.height = scale(120);
-    rabbit.speed = scale(8);
     rabbit.y = canvas.height - rabbit.height - scale(20);
 
     carrot.width = scale(50);
@@ -69,65 +68,13 @@ function resizeCanvas() {
 
     resetCarrot();
 }
-
 window.addEventListener("resize", resizeCanvas);
 
-// ================= 初始化 =================
+// ================= 胡蘿蔔重生 =================
 function resetCarrot() {
     carrot.x = Math.random() * (canvas.width - carrot.width);
     carrot.y = -carrot.height;
 }
 
-// ================= 操作 =================
-const keys = {};
-window.addEventListener("keydown", e => keys[e.key] = true);
-window.addEventListener("keyup", e => keys[e.key] = false);
-
-// ================= 更新 =================
-function update() {
-    if (keys["ArrowLeft"]) rabbit.x -= rabbit.speed;
-    if (keys["ArrowRight"]) rabbit.x += rabbit.speed;
-
-    rabbit.x = Math.max(0, Math.min(canvas.width - rabbit.width, rabbit.x));
-
-    carrot.y += carrot.speed;
-
-    // 碰撞偵測
-    if (
-        rabbit.x < carrot.x + carrot.width &&
-        rabbit.x + rabbit.width > carrot.x &&
-        rabbit.y < carrot.y + carrot.height &&
-        rabbit.y + rabbit.height > carrot.y
-    ) {
-        resetCarrot();
-    }
-
-    if (carrot.y > canvas.height) {
-        resetCarrot();
-    }
-}
-
-// ================= 繪製 =================
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(rabbitImg, rabbit.x, rabbit.y, rabbit.width, rabbit.height);
-    ctx.drawImage(carrotImg, carrot.x, carrot.y, carrot.width, carrot.height);
-}
-
-// ================= 主迴圈 =================
-function gameLoop() {
-    update();
-    draw();
-    requestAnimationFrame(gameLoop);
-}
-
-// ================= 啟動 =================
-rabbitImg.onload = () => {
-    resizeCanvas();
-    rabbit.x = (canvas.width - rabbit.width) / 2;
-    gameLoop();
-};
-</script>
-
-</body>
-</html>
+// ================= 滑鼠控制 =================
+canvas.addEventListen
