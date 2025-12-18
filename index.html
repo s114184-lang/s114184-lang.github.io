@@ -77,4 +77,56 @@ function resetCarrot() {
 }
 
 // ================= 滑鼠控制 =================
-canvas.addEventListen
+canvas.addEventListener("mousemove", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+
+    rabbit.x = mouseX - rabbit.width / 2;
+
+    // 不超出畫面
+    rabbit.x = Math.max(0, Math.min(canvas.width - rabbit.width, rabbit.x));
+});
+
+// ================= 更新 =================
+function update() {
+    carrot.y += carrot.speed;
+
+    // 碰撞偵測
+    if (
+        rabbit.x < carrot.x + carrot.width &&
+        rabbit.x + rabbit.width > carrot.x &&
+        rabbit.y < carrot.y + carrot.height &&
+        rabbit.y + rabbit.height > carrot.y
+    ) {
+        resetCarrot();
+    }
+
+    if (carrot.y > canvas.height) {
+        resetCarrot();
+    }
+}
+
+// ================= 繪製 =================
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(rabbitImg, rabbit.x, rabbit.y, rabbit.width, rabbit.height);
+    ctx.drawImage(carrotImg, carrot.x, carrot.y, carrot.width, carrot.height);
+}
+
+// ================= 主迴圈 =================
+function gameLoop() {
+    update();
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+
+// ================= 啟動 =================
+rabbitImg.onload = () => {
+    resizeCanvas();
+    rabbit.x = (canvas.width - rabbit.width) / 2;
+    gameLoop();
+};
+</script>
+
+</body>
+</html>
